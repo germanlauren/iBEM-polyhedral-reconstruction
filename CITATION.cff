@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+title: "iBEM polyhedral eigenstrain potentials — reconstruction and validation"
+message: "If you use this software, please cite the accompanying manuscript."
+authors:
+  - family-names: Romero-Suárez
+    given-names: German Orlando
+  - family-names: Villegas-Bermúdez
+    given-names: Diego Fernando
+  - family-names: Martínez
+    given-names: Manuel de Jesús
+license: GPL-3.0
+repository-code: "https://github.com/germanlauren/iBEM-polyhedral-reconstruction"
