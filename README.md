@@ -14,23 +14,44 @@ boundary element (iBEM) method"* (Romero-Suárez, Villegas-Bermúdez, Martínez)
 The linear and quadratic polyhedral integral classes of iBEM are built on a
 `Uniform_Polyhedral` class exposing seven functions — the harmonic potential Φ and
 Φ,i, Φ,ij, and the biharmonic Ψ,i, Ψ,ij, Ψ,ijk, Ψ,ijkl — which is not distributed.
-`src/Uniform_Polyhedral_integral.{h,cpp}` provides it in closed form:
+`src/Uniform_Polyhedral_integral.{h,cpp}` provides it by a **semi-analytical
+face-and-edge reduction** — the three-dimensional volume potentials are reduced
+analytically to face contributions and one-dimensional edge integrals; the harmonic
+edge contribution is analytical, and the biharmonic edge integral is evaluated by a
+converged one-dimensional Gauss–Legendre quadrature (it is therefore semi-analytical,
+not fully closed form):
 
-- harmonic edge kernel  w = b·ln[(r⁺+l⁺)/(r⁻+l⁻)] − |a|[atan(bl⁺/(d²+|a|r⁺)) − atan(bl⁻/(d²+|a|r⁻))]
+- harmonic edge kernel  w = b·ln[(r⁺+l⁺)/(r⁻+l⁻)] − |a|[atan2(bl⁺, d²+|a|r⁺) − atan2(bl⁻, d²+|a|r⁻)]
 - biharmonic edge kernel v = ∫_{l⁻}^{l⁺} b[(a²+b²+l²)^{3/2} − |a|³] / (3(b²+l²)) dl
 - all derivatives assembled by contracting the mixed parameter partials of the
-  kernels with the constant parameter gradients (48-point Gauss–Legendre for v).
+  kernels with the constant parameter gradients (96-point Gauss–Legendre for v,
+  retained after the convergence study in `convergence/`).
 
 `src/Uniform_polygon_integral.h` restores the missing 2-D face-potential header.
 
-## Validation (machine precision)
-`validation/` reproduces every check reported in the paper:
+## Validation (near-machine precision)
+`validation/` reproduces the pointwise checks reported in the paper:
 - `potentials_reference.py` — direct tetra-quadrature ground truth for φ, ψ.
-- `harmonic_closed.py`, `harmonic_hessian.py` — closed-form φ, φ,i, φ,ij vs reference
+- `harmonic_closed.py`, `harmonic_hessian.py` — analytical φ, φ,i, φ,ij vs reference
   (φ,ij vs finite difference: 3×10⁻¹¹; symmetric to 2×10⁻¹⁶; traceless outside body).
 - `biharmonic_full.py` — ψ,i…ψ,ijkl; identities ∇²ψ = 2φ and ∇²(ψ,ij) = 2φ,ij to ≤8×10⁻¹⁵.
 The C++ port reproduces the Python reference to 4×10⁻¹⁵ and is free of non-finite
-values across degenerate geometries.
+values for the near-degenerate limits tested (a→0, b→0, l±→0; near-face/edge/vertex).
+
+## Convergence and verification studies
+`convergence/` reproduces every convergence study and error figure in the paper:
+- `convergence_edge.py` — edge-quadrature convergence of ψ,ij and ψ,ijkl vs Nₘ ∈ {12,24,48,96,192}.
+- `verification_set.py` — φ vs reference volume quadrature by normalized boundary
+  distance (45 tetrahedra, 1799 exterior points) and the differential-identity /
+  symmetry residuals (near-machine precision).
+- `bem_convergence.py` — BEM discretization convergence on the unit-contrast cube
+  (normal-component bias 14.2 % → 7.1 % → 4.2 %; symmetry residual ~10⁻¹⁶).
+- `porosity_sweep.py` — building-block RVE effective modulus vs core pore fraction.
+- `make_conv_figs.py` — regenerates Figures 4a and 4b.
+
+The BEM-solver scripts (`bem_convergence.py`, `porosity_sweep.py`) require a compiled
+iBEM binary; set its path in `homogenization/ibem_homog.py` (`BIN`). The potential-only
+studies (`convergence_edge.py`, `verification_set.py`) run from Python + NumPy + SymPy alone.
 
 ## Build
 1. Obtain the iBEM library (github.com/iBemResearch/iBEM).
