@@ -47,6 +47,9 @@ values for the near-degenerate limits tested (a→0, b→0, l±→0; near-face/e
 - `bem_convergence.py` — BEM discretization convergence on the unit-contrast cube
   (normal-component bias 14.2 % → 7.1 % → 4.2 %; symmetry residual ~10⁻¹⁶).
 - `porosity_sweep.py` — building-block RVE effective modulus vs core pore fraction.
+- `eshelby_run.py` — dilute Eshelby/Mori–Tanaka benchmark (stiff sphere, contrast 10):
+  the effective modulus agrees with the analytical sphere to 1.9 % (φ=0.05) and 0.2 % (φ=0.10),
+  with reciprocity C=Cᵀ to ≤5×10⁻¹⁵ and positive-definite recovered tensors.
 - `make_conv_figs.py` — regenerates Figures 4a and 4b.
 
 The BEM-solver scripts (`bem_convergence.py`, `porosity_sweep.py`) require a compiled
